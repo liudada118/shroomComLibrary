@@ -6,6 +6,8 @@ import { upscaleDataSmooth } from '../utils/dataProcessing';
 // ==================== Shader Code ====================
 
 const vertexShader = `
+precision highp float;
+precision highp int;
 varying vec2 vUv;
 varying float vPressure;
 varying vec3 vViewPosition;
@@ -99,6 +101,8 @@ void main() {
 `;
 
 const fragmentShader = `
+precision highp float;
+precision highp int;
 varying vec2 vUv;
 varying float vPressure;
 varying vec3 vNormal;
@@ -158,6 +162,106 @@ void main() {
 }
 `;
 
+const vertexShaderFlat = `
+precision highp float;
+precision highp int;
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vViewPosition;
+
+void main() {
+  vUv = uv;
+  vNormal = normalize(normalMatrix * normal);
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  vViewPosition = -mvPosition.xyz;
+  gl_Position = projectionMatrix * mvPosition;
+}
+`;
+
+const fragmentShaderFlat = `
+precision highp float;
+precision highp int;
+varying vec2 vUv;
+varying vec3 vNormal;
+varying vec3 vViewPosition;
+
+uniform sampler2D uPressureMap;
+uniform bool uShowHeatmap;
+uniform vec3 uBaseColor;
+uniform float uSmoothness;
+
+vec3 getHeatmapColor(float t) {
+  t = clamp(t, 0.0, 1.0);
+  t = smoothstep(0.0, 1.0, t);
+  
+  vec3 c0 = vec3(0.0, 0.0, 0.5);
+  vec3 c1 = vec3(0.0, 0.5, 1.0);
+  vec3 c2 = vec3(0.0, 1.0, 0.5);
+  vec3 c3 = vec3(0.5, 1.0, 0.0);
+  vec3 c4 = vec3(1.0, 0.8, 0.0);
+  vec3 c5 = vec3(1.0, 0.3, 0.0);
+  vec3 c6 = vec3(0.5, 0.0, 0.0);
+  
+  if (t < 0.167) return mix(c0, c1, t / 0.167);
+  if (t < 0.333) return mix(c1, c2, (t - 0.167) / 0.166);
+  if (t < 0.5) return mix(c2, c3, (t - 0.333) / 0.167);
+  if (t < 0.667) return mix(c3, c4, (t - 0.5) / 0.167);
+  if (t < 0.833) return mix(c4, c5, (t - 0.667) / 0.166);
+  return mix(c5, c6, (t - 0.833) / 0.167);
+}
+
+float getPressure(vec2 uv) {
+  float p = texture2D(uPressureMap, uv).r;
+  if (uSmoothness < 0.01) return p;
+  float texSize = 128.0;
+  float offset = 1.0 / texSize;
+  float blurred = 0.0;
+  float kernel[9];
+  kernel[0] = 0.077847; kernel[1] = 0.123317; kernel[2] = 0.077847;
+  kernel[3] = 0.123317; kernel[4] = 0.195346; kernel[5] = 0.123317;
+  kernel[6] = 0.077847; kernel[7] = 0.123317; kernel[8] = 0.077847;
+  int idx = 0;
+  for (int dy = -1; dy <= 1; dy++) {
+    for (int dx = -1; dx <= 1; dx++) {
+      vec2 sampleUv = uv + vec2(float(dx) * offset, float(dy) * offset);
+      blurred += texture2D(uPressureMap, sampleUv).r * kernel[idx];
+      idx++;
+    }
+  }
+  float smoothFactor = clamp(uSmoothness, 0.0, 1.0);
+  return mix(p, blurred, smoothFactor);
+}
+
+void main() {
+  vec3 normal = normalize(vNormal);
+  if (!gl_FrontFacing) normal = -normal;
+
+  vec3 lightDir = normalize(vec3(0.5, 0.5, 1.0));
+  
+  vec3 ambient = vec3(0.35);
+  float diff = max(dot(normal, lightDir), 0.0);
+  vec3 diffuse = diff * vec3(0.65);
+  
+  vec3 viewDir = normalize(vViewPosition);
+  vec3 reflectDir = reflect(-lightDir, normal);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
+  vec3 specular = spec * vec3(0.15);
+
+  float pressure = getPressure(vUv);
+  vec3 surfaceColor = uBaseColor;
+  if (!gl_FrontFacing) {
+    surfaceColor = vec3(0.4, 0.4, 0.4);
+  } else if (uShowHeatmap && pressure > 0.005) {
+    vec3 heatColor = getHeatmapColor(pressure);
+    float blendFactor = smoothstep(0.0, 0.1, pressure) * 0.95;
+    surfaceColor = mix(surfaceColor, heatColor, blendFactor);
+  }
+
+  vec3 finalColor = (ambient + diffuse) * surfaceColor + specular;
+  gl_FragColor = vec4(finalColor, 1.0);
+}
+`;
+
 // ==================== Constants ====================
 
 const TEXTURE_SIZE = 128;
@@ -166,7 +270,7 @@ const THICKNESS = 0.015;
 
 // ==================== Helper: Create single footpad mesh ====================
 
-function createFootpadMesh() {
+function createFootpadMesh({ supportsDisplacement }) {
   const geometry = new THREE.BoxGeometry(
     PAD_SIZE, PAD_SIZE, THICKNESS,
     128, 128, 1
@@ -174,20 +278,23 @@ function createFootpadMesh() {
 
   // Create pressure texture
   const size = TEXTURE_SIZE * TEXTURE_SIZE;
-  const data = new Float32Array(size);
+  const data = new Uint8Array(size);
   data.fill(0);
   const texture = new THREE.DataTexture(
-    data, TEXTURE_SIZE, TEXTURE_SIZE,
-    THREE.RedFormat, THREE.FloatType
+    data,
+    TEXTURE_SIZE,
+    TEXTURE_SIZE,
+    THREE.RedFormat,
+    THREE.UnsignedByteType
   );
   texture.magFilter = THREE.LinearFilter;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
   texture.needsUpdate = true;
 
   const material = new THREE.ShaderMaterial({
-    vertexShader,
-    fragmentShader,
+    vertexShader: supportsDisplacement ? vertexShader : vertexShaderFlat,
+    fragmentShader: supportsDisplacement ? fragmentShader : fragmentShaderFlat,
     uniforms: {
       uPressureMap: { value: texture },
       uDisplacementScale: { value: 0.1 },
@@ -215,6 +322,9 @@ export default function ThreeScene({
   className,
   style
 }) {
+
+  console.log(sensorData)
+
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
@@ -311,13 +421,15 @@ export default function ThreeScene({
     highlight.position.y = 0.002;
     scene.add(highlight);
 
+    const supportsDisplacement = renderer.capabilities.maxVertexTextures > 0;
+
     // Create 4 footpad meshes in 1x4 seamless layout
     const totalWidth = 4 * PAD_SIZE;
     const startX = -totalWidth / 2 + PAD_SIZE / 2;
     const footpads = [];
 
     for (let i = 0; i < 4; i++) {
-      const { mesh, texture, material } = createFootpadMesh();
+      const { mesh, texture, material } = createFootpadMesh({ supportsDisplacement });
       mesh.position.set(startX + i * PAD_SIZE, 0.01, 0);
       scene.add(mesh);
       footpads.push({ mesh, texture, material });
@@ -381,31 +493,51 @@ export default function ThreeScene({
 
   // Update texture data when sensorData changes
   useEffect(() => {
-    const keys = ['sensor1', 'sensor2', 'sensor3', 'sensor4'];
-    keys.forEach((key, idx) => {
+    const sourceList = Array.isArray(sensorData)
+      ? sensorData
+      : [sensorData?.sensor1, sensorData?.sensor2, sensorData?.sensor3, sensorData?.sensor4];
+
+    sourceList.forEach((data, idx) => {
       const footpad = footpadsRef.current[idx];
-      if (!footpad) return;
+      if (!footpad || !data) return;
 
-      const data = sensorData[key];
-      if (data && data.length === 64) {
-        const upscaledData = upscaleDataSmooth(data, TEXTURE_SIZE);
-        const texData = footpad.texture.image.data;
-
-        for (let r = 0; r < TEXTURE_SIZE; r++) {
-          for (let c = 0; c < TEXTURE_SIZE; c++) {
-            const srcIdx = (TEXTURE_SIZE - 1 - r) * TEXTURE_SIZE + c;
-            const val = upscaledData[srcIdx];
-            texData[r * TEXTURE_SIZE + c] = Math.min(val / 255.0, 1.0);
-          }
+      let upscaledData = null;
+      const isArrayLike = Array.isArray(data) || ArrayBuffer.isView(data);
+      if (isArrayLike) {
+        if (data.length === TEXTURE_SIZE * TEXTURE_SIZE) {
+          upscaledData = data;
+        } else {
+          upscaledData = upscaleDataSmooth(data, TEXTURE_SIZE);
         }
-        footpad.texture.needsUpdate = true;
+      } else if (Array.isArray(data?.data) || ArrayBuffer.isView(data?.data)) {
+        upscaledData = upscaleDataSmooth(data.data, TEXTURE_SIZE);
       }
+
+      if (!upscaledData) return;
+
+      let maxVal = 0;
+      for (let i = 0; i < upscaledData.length; i++) {
+        const v = upscaledData[i];
+        if (v > maxVal) maxVal = v;
+      }
+      let scale = 1;
+      if (maxVal > 0 && maxVal <= 1.0) scale = 255;
+      else if (maxVal > 255) scale = 255 / maxVal;
+
+      const texData = footpad.texture.image.data;
+      for (let r = 0; r < TEXTURE_SIZE; r++) {
+        for (let c = 0; c < TEXTURE_SIZE; c++) {
+          const srcIdx = (TEXTURE_SIZE - 1 - r) * TEXTURE_SIZE + c;
+          const val = (upscaledData[srcIdx] ?? 0) * scale;
+          texData[r * TEXTURE_SIZE + c] = Math.min(Math.max(Math.round(val), 0), 255);
+        }
+      }
+      footpad.texture.needsUpdate = true;
     });
   }, [sensorData]);
 
   return (
     <div
-      ref={containerRef}
       className={className}
       style={{
         width: '100%',
@@ -415,6 +547,10 @@ export default function ThreeScene({
         ...style
       }}
     >
+      <div
+        ref={containerRef}
+        style={{ width: '100%', height: '100%' }}
+      />
       <div
         style={{
           position: 'absolute',

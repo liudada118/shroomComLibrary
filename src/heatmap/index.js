@@ -2,6 +2,8 @@
 export { default as CanvasHeatmap } from './canvasMap/CanvasHeatmap.jsx'
 export { default as ThreeAndCarPoint } from './threePoint/ThreeAndCarPoint.jsx'
 export { Scene as ThreeSinkScene } from './threeSink/Scene.jsx'
+export { Scene256x64 as ThreeSinkScene256x64 } from './threeSink/Scene256x64.jsx'
 export { default as WebglHeatmap } from './webglMap/WebglHeatmap.jsx'
 export { default as SitAndFootScene } from './sitAndfoot/ThreeScene.jsx'
 export { default as FootLenScene } from './footLen/ThreeScene.jsx'
+export { default as FootSinkScene } from './footSink/ThreeScene.jsx'

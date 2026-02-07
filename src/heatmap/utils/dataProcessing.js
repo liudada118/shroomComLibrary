@@ -3,7 +3,8 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const to2D = (input) => {
   if (!input) return []
   if (Array.isArray(input[0])) return input
-  const flat = Array.isArray(input) ? input : []
+  const isArrayLike = Array.isArray(input) || ArrayBuffer.isView(input)
+  const flat = isArrayLike ? input : []
   const size = Math.sqrt(flat.length)
   if (!Number.isInteger(size)) return []
   const output = []
@@ -111,4 +112,3 @@ export function upscaleDataSmooth(input, targetSize = 256) {
 
   return output
 }
-

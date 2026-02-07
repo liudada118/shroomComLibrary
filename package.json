@@ -50,6 +50,10 @@
       "import": "./dist/shroomcomlibrary.es.js",
       "require": "./dist/shroomcomlibrary.umd.cjs"
     },
+    "./heatmap/foot-sink": {
+      "import": "./dist/shroomcomlibrary.es.js",
+      "require": "./dist/shroomcomlibrary.umd.cjs"
+    },
     "./playback": {
       "import": "./dist/shroomcomlibrary.es.js",
       "require": "./dist/shroomcomlibrary.umd.cjs"

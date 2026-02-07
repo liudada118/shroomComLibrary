@@ -353,6 +353,8 @@ export function ThreeScene({
   className,
   style
 }) {
+
+  // console.log(seatData ,footpadData ,realtimeData )
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);

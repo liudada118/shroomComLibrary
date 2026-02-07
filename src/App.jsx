@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+﻿import React, { useEffect, useMemo, useState } from 'react'
 import * as echarts from 'echarts'
 import SimpleLineChart from './charts/simple/SimpleLineChart'
 import ReplayWindowLineChart from './charts/replay/ReplayWindowLineChart'
@@ -10,6 +10,7 @@ import PlaybackBar from './playback/PlaybackBar'
 import { Scene as ThreeSinkScene } from './heatmap/threeSink/Scene'
 import SitAndFootScene from './heatmap/sitAndfoot/ThreeScene'
 import FootLenScene from './heatmap/footLen/ThreeScene'
+import FootSinkScene from './heatmap/footSink/ThreeScene'
 
 const toNumber = (value, fallback = 0) => {
   const num = Number(value)
@@ -104,6 +105,13 @@ export default function App() {
   const [footSmoothness, setFootSmoothness] = useState(0.5)
   const [footSensorData, setFootSensorData] = useState(null)
 
+  const [footSinkShowHeatmap, setFootSinkShowHeatmap] = useState(true)
+  const [footSinkEnableClipping, setFootSinkEnableClipping] = useState(false)
+  const [footSinkClipLevel, setFootSinkClipLevel] = useState(0.35)
+  const [footSinkDepthScale, setFootSinkDepthScale] = useState(0.35)
+  const [footSinkSmoothness, setFootSinkSmoothness] = useState(0.6)
+  const [footSinkRealtimeData, setFootSinkRealtimeData] = useState(null)
+
   const [playbackIndex, setPlaybackIndex] = useState(0)
   const [playbackSpeed, setPlaybackSpeed] = useState('1.0')
   const [playbackPaused, setPlaybackPaused] = useState(true)
@@ -127,6 +135,18 @@ export default function App() {
       rows[r] = row
     }
     return rows
+  }
+
+  const buildRect = (rows, cols, maxValue) => {
+    const data = new Array(rows)
+    for (let r = 0; r < rows; r++) {
+      const row = new Array(cols)
+      for (let c = 0; c < cols; c++) {
+        row[c] = Math.round(Math.random() * maxValue)
+      }
+      data[r] = row
+    }
+    return data
   }
 
   const buildFlat = (length, maxValue) =>
@@ -172,13 +192,25 @@ export default function App() {
 
   useEffect(() => {
     if (activeKey !== 'foot-len') return
-    const timer = setInterval(() => {
+    const update = () => {
+      console.log('xuanran')
       setFootSensorData({
-        sensor1: buildFlat(64, 255),
-        sensor2: buildFlat(64, 255),
-        sensor3: buildFlat(64, 255),
-        sensor4: buildFlat(64, 255)
+        sensor1: buildFlat(64 * 64, 255),
+        sensor2: buildFlat(64 * 64, 255),
+        sensor3: buildFlat(64 * 64, 255),
+        sensor4: buildFlat(64 * 64, 255)
       })
+    }
+
+    update()
+    const timer = setInterval(update, 100)
+    return () => clearInterval(timer)
+  }, [activeKey])
+
+  useEffect(() => {
+    if (activeKey !== 'foot-sink') return
+    const timer = setInterval(() => {
+      setFootSinkRealtimeData(buildRect(64, 256, 255))
     }, 100)
     return () => clearInterval(timer)
   }, [activeKey])
@@ -336,6 +368,13 @@ export default function App() {
                 >
                   步道渲染
                 </button>
+                <button
+                  className={activeKey === 'foot-sink' ? 'is-active' : ''}
+                  onClick={() => setActiveKey('foot-sink')}
+                  type="button"
+                >
+                  步道下陷
+                </button>
               </nav>
             )}
           </div>
@@ -364,7 +403,8 @@ export default function App() {
           </div>
         </aside>
 
-        <section className="docs-content single">
+        <section className="docs-content single">
+
           {activeKey === 'realtime' ? (
             <section id="realtime" className="docs-section">
               <div className="section-head">
@@ -520,7 +560,8 @@ const area1 = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                   </div>
                 </div>
               </article>
-            </section>
+            </section>
+
           ) : activeKey === 'matrix' ? (
             <section id="matrix" className="docs-section">
               <div className="section-head">
@@ -851,7 +892,8 @@ const area1 = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                   </div>
                 </div>
               </article>
-            </section>
+            </section>
+
           ) : activeKey === 'webgl-heatmap' ? (
             <section id="webgl-heatmap" className="docs-section">
               <div className="section-head">
@@ -1420,6 +1462,135 @@ const area1 = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 </div>
               </article>
             </section>
+          ) : activeKey === 'foot-sink' ? (
+            <section id="foot-sink" className="docs-section">
+              <div className="section-head">
+                <h2>步道下陷</h2>
+                <span className="section-desc">256×64 步道压力下陷渲染。</span>
+              </div>
+
+              <article className="component-card">
+                <div className="component-head">
+                  <div>
+                    <h3>FootSinkScene</h3>
+                    <p>支持热力、裁剪与下陷深度调节。</p>
+                  </div>
+                  <div className="component-tag">渲染类</div>
+                </div>
+
+                <div className="component-controls">
+                  <div className="control-row">
+                    <span className="control-label">热力/裁剪</span>
+                    <div className="control-inline">
+                      <label className="control-toggle">
+                        <input
+                          type="checkbox"
+                          checked={footSinkShowHeatmap}
+                          onChange={(e) => setFootSinkShowHeatmap(e.target.checked)}
+                        />
+                        热力
+                      </label>
+                      <label className="control-toggle">
+                        <input
+                          type="checkbox"
+                          checked={footSinkEnableClipping}
+                          onChange={(e) => setFootSinkEnableClipping(e.target.checked)}
+                        />
+                        裁剪
+                      </label>
+                    </div>
+                  </div>
+                  <div className="control-row">
+                    <span className="control-label">裁剪位置</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={footSinkClipLevel}
+                      onChange={(e) => setFootSinkClipLevel(toNumber(e.target.value, 0.35))}
+                    />
+                  </div>
+                  <div className="control-row">
+                    <span className="control-label">深度/平滑</span>
+                    <div className="control-inline">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={footSinkDepthScale}
+                        onChange={(e) => setFootSinkDepthScale(toNumber(e.target.value, 0.35))}
+                      />
+                      <input
+                        type="number"
+                        step="0.05"
+                        value={footSinkSmoothness}
+                        onChange={(e) => setFootSinkSmoothness(toNumber(e.target.value, 0.6))}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="component-demo" style={{ height: '22rem' }}>
+                  <FootSinkScene
+                    showHeatmap={footSinkShowHeatmap}
+                    enableClipping={footSinkEnableClipping}
+                    clipLevel={footSinkClipLevel}
+                    depthScale={footSinkDepthScale}
+                    smoothness={footSinkSmoothness}
+                    realtimeData={footSinkRealtimeData}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                </div>
+
+                <div className="component-usage">
+                  <div className="usage-title">使用说明</div>
+                  <pre>
+                    <code>{`import { FootSinkScene } from 'shroomcomlibrary/heatmap/foot-sink'
+
+<FootSinkScene
+  showHeatmap
+  enableClipping={false}
+  clipLevel={0.35}
+  depthScale={0.35}
+  smoothness={0.6}
+  realtimeData={data256x64}
+/>`}</code>
+                  </pre>
+                </div>
+
+                <div className="component-props">
+                  <div className="usage-title">Props</div>
+                  <div className="props-grid">
+                    <div className="props-row">
+                      <div className="props-name">showHeatmap</div>
+                      <div>是否显示热力色。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">enableClipping</div>
+                      <div>是否启用裁剪。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">clipLevel</div>
+                      <div>裁剪位置（0-1）。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">depthScale</div>
+                      <div>下陷深度系数。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">smoothness</div>
+                      <div>平滑系数（0-1）。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">realtimeData</div>
+                      <div>可选，实时数据（二维 64×256 或扁平 16384）。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">className / style</div>
+                      <div>容器类名与样式。</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </section>
           ) : activeKey === 'foot-len' ? (
             <section id="foot-len" className="docs-section">
               <div className="section-head">
@@ -1549,7 +1720,7 @@ const area1 = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                     onSpeedChange={setPlaybackSpeed}
                     showHistory
                     historyLabel="历史"
-                    onHistoryClick={() => {}}
+                    onHistoryClick={() => { }}
                     timestamp={playbackTimestamp}
                     formatTimestamp={(t) => new Date(t).toLocaleString()}
                   />
@@ -1613,4 +1784,5 @@ const area1 = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
       </main>
     </div>
   )
-}
+}
+
