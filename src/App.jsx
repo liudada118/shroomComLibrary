@@ -6,6 +6,7 @@ import NumThreeColor from './heatmap/threeNum/NumThreeColor'
 import CanvasHeatmap from './heatmap/canvasMap/CanvasHeatmap'
 import ThreeAndCarPoint from './heatmap/threePoint/ThreeAndCarPoint'
 import WebglHeatmap from './heatmap/webglMap/WebglHeatmap'
+import HandHeatmapModel from './heatmap/handmodal/HandHeatmapModel'
 import PlaybackBar from './playback/PlaybackBar'
 import { Scene as ThreeSinkScene } from './heatmap/threeSink/Scene'
 import SitAndFootScene from './heatmap/sitAndfoot/ThreeScene'
@@ -84,6 +85,11 @@ export default function App() {
   const [webglBorder, setWebglBorder] = useState(6)
   const [webglMirror, setWebglMirror] = useState(true)
   const [webglCanvasSize, setWebglCanvasSize] = useState(512)
+
+  const [handType, setHandType] = useState('left')
+  const [handRecording, setHandRecording] = useState(false)
+  const [handPressure, setHandPressure] = useState(0)
+  const [handData, setHandData] = useState(null)
 
   const [sinkShowHeatmap, setSinkShowHeatmap] = useState(true)
   const [sinkEnableClipping, setSinkEnableClipping] = useState(false)
@@ -204,6 +210,17 @@ export default function App() {
 
     update()
     const timer = setInterval(update, 100)
+    return () => clearInterval(timer)
+  }, [activeKey])
+
+  useEffect(() => {
+    if (activeKey !== 'hand-heatmap') return
+    const update = () => {
+      setHandData(buildFlat(16 * 16, 500))
+      setHandPressure(Math.round(Math.random() * 100))
+    }
+    update()
+    const timer = setInterval(update, 200)
     return () => clearInterval(timer)
   }, [activeKey])
 
@@ -339,6 +356,13 @@ export default function App() {
                   type="button"
                 >
                   WebGL 热力图
+                </button>
+                <button
+                  className={activeKey === 'hand-heatmap' ? 'is-active' : ''}
+                  onClick={() => setActiveKey('hand-heatmap')}
+                  type="button"
+                >
+                  手部热力图
                 </button>
                 <button
                   className={activeKey === 'three-point' ? 'is-active' : ''}
@@ -1042,6 +1066,98 @@ const area1 = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                     <div className="props-row">
                       <div className="props-name">style</div>
                       <div>容器样式，需要显式宽高。</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </section>
+          ) : activeKey === 'hand-heatmap' ? (
+            <section id="hand-heatmap" className="docs-section">
+              <div className="section-head">
+                <h2>手部热力图</h2>
+                <span className="section-desc">手掌压力热力映射模型。</span>
+              </div>
+
+              <article className="component-card">
+                <div className="component-head">
+                  <div>
+                    <h3>HandHeatmapModel</h3>
+                    <p>支持左右手切换、录制状态与压力指示。</p>
+                  </div>
+                  <div className="component-tag">渲染类</div>
+                </div>
+
+                <div className="component-controls">
+                  <div className="control-row">
+                    <span className="control-label">手型</span>
+                    <div className="control-inline">
+                      <select value={handType} onChange={(e) => setHandType(e.target.value)}>
+                        <option value="left">left</option>
+                        <option value="right">right</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="control-row">
+                    <span className="control-label">录制/压力</span>
+                    <div className="control-inline">
+                      <label className="control-toggle">
+                        <input
+                          type="checkbox"
+                          checked={handRecording}
+                          onChange={(e) => setHandRecording(e.target.checked)}
+                        />
+                        录制
+                      </label>
+                      <input
+                        type="number"
+                        value={handPressure}
+                        onChange={(e) => setHandPressure(toNumber(e.target.value, 0))}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="component-demo" style={{ height: '22rem' }}>
+                  <HandHeatmapModel
+                    data={handData || []}
+                    handType={handType}
+                    isRecording={handRecording}
+                    pressureValue={handPressure}
+                  />
+                </div>
+
+                <div className="component-usage">
+                  <div className="usage-title">使用说明</div>
+                  <pre>
+                    <code>{`import { HandHeatmapModel } from 'shroomcomlibrary/heatmap/hand-heatmap'
+
+<HandHeatmapModel
+  data={data} // 16x16 => 256 长度数组
+  handType="left"
+  isRecording={false}
+  pressureValue={0}
+/>`}</code>
+                  </pre>
+                </div>
+
+                <div className="component-props">
+                  <div className="usage-title">Props</div>
+                  <div className="props-grid">
+                    <div className="props-row">
+                      <div className="props-name">data</div>
+                      <div>数组或对象，长度 256（16×16）。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">handType</div>
+                      <div>left / right。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">isRecording</div>
+                      <div>是否显示录制态。</div>
+                    </div>
+                    <div className="props-row">
+                      <div className="props-name">pressureValue</div>
+                      <div>压力值显示。</div>
                     </div>
                   </div>
                 </div>

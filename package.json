@@ -42,6 +42,10 @@
       "import": "./dist/shroomcomlibrary.es.js",
       "require": "./dist/shroomcomlibrary.umd.cjs"
     },
+    "./heatmap/hand-heatmap": {
+      "import": "./dist/shroomcomlibrary.es.js",
+      "require": "./dist/shroomcomlibrary.umd.cjs"
+    },
     "./heatmap/sit-and-foot": {
       "import": "./dist/shroomcomlibrary.es.js",
       "require": "./dist/shroomcomlibrary.umd.cjs"

@@ -4,6 +4,7 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: ['**/*.glb'],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.js'),

@@ -421,7 +421,7 @@ export default function ThreeScene({
     highlight.position.y = 0.002;
     scene.add(highlight);
 
-    const supportsDisplacement = renderer.capabilities.maxVertexTextures > 0;
+    const supportsDisplacement = false;
 
     // Create 4 footpad meshes in 1x4 seamless layout
     const totalWidth = 4 * PAD_SIZE;

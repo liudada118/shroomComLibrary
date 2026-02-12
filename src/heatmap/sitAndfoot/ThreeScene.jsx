@@ -599,7 +599,10 @@ export function ThreeScene({
     
     for (let r = 0; r < TEXTURE_SIZE; r++) {
       for (let c = 0; c < TEXTURE_SIZE; c++) {
-        const srcIdx = (TEXTURE_SIZE - 1 - r) * TEXTURE_SIZE + c;
+        // Rotate footpad data 90° clockwise (x,y) -> (y, N-1-x)
+        const srcRow = TEXTURE_SIZE - 1 - c;
+        const srcCol = r;
+        const srcIdx = srcRow * TEXTURE_SIZE + srcCol;
         const val = upscaledData[srcIdx];
         data[r * TEXTURE_SIZE + c] = Math.min(val / 255.0, 1.0);
       }

@@ -164,6 +164,26 @@ import { WebglHeatmap } from 'shroomcomlibrary/heatmap/webgl-heatmap'
 - `canvasWidth / canvasHeight`: 画布尺寸。
 - `style`: 容器样式，需要显式宽高。
 
+## 手部热力图（HandHeatmapModel）
+
+```jsx
+import { HandHeatmapModel } from 'shroomcomlibrary/heatmap/hand-heatmap'
+
+<HandHeatmapModel
+  data={data} // 16x16 => 256 长度数组
+  handType="left"
+  isRecording={false}
+  pressureValue={0}
+/>
+```
+
+### Props
+
+- `data`: 数组或对象（`{ arr: number[] }`），长度 256。
+- `handType`: `left` / `right`。
+- `isRecording`: 是否显示录制态。
+- `pressureValue`: 压力数值显示。
+
 ## 下陷渲染（ThreeSinkScene）
 
 ```jsx

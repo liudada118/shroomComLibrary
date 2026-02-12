@@ -6163,8 +6163,8 @@ function t7({
     const E = vo(S, w), _ = p.current.image.data;
     for (let P = 0; P < w; P++)
       for (let R = 0; R < w; R++) {
-        const T = (w - 1 - P) * w + R, F = E[T];
-        _[P * w + R] = Math.min(F / 255, 1);
+        const T = w - 1 - R, F = P, k = T * w + F, D = E[k];
+        _[P * w + R] = Math.min(D / 255, 1);
       }
     p.current.needsUpdate = !0;
   }, [S]), Te(() => {
@@ -6671,7 +6671,7 @@ function r7({
       side: A.DoubleSide
     }), T = new A.Mesh(P, R);
     T.rotation.x = -Math.PI / 2, T.position.y = 2e-3, m.add(T);
-    const F = f.capabilities.maxVertexTextures > 0, k = 4 * Yt, D = -k / 2 + Yt / 2, $ = [];
+    const F = !1, k = 4 * Yt, D = -k / 2 + Yt / 2, $ = [];
     for (let U = 0; U < 4; U++) {
       const { mesh: V, texture: Q, material: K } = il({ supportsDisplacement: F });
       V.position.set(D + U * Yt, 0.01, 0), m.add(V), $.push({ mesh: V, texture: Q, material: K });
