@@ -192,7 +192,10 @@ export function HandHeatmapModel({
   data,
   handType = 'left',
   isRecording = false,
-  pressureValue = 0
+  pressureValue = 0,
+  modelScale = 1,
+  modelRotation = { x: 0, y: 0, z: 0 },
+  modelPosition = { x: 0, y: 0, z: 0 }
 }) {
   const heatmapRef = useRef(null)
   const [heatmapCanvas, setHeatmapCanvas] = useState(null)
@@ -251,6 +254,9 @@ export function HandHeatmapModel({
       isLeftHand={isLeftHand}
       heatmapCanvas={heatmapCanvas}
       heatmapVersion={heatmapVersion}
+      modelScale={modelScale}
+      modelRotation={modelRotation}
+      modelPosition={modelPosition}
     />
   )
 }

@@ -8,7 +8,10 @@ export function HandModel({
   pressureValue = 0,
   isLeftHand = true,
   heatmapCanvas = null,
-  heatmapVersion = 0
+  heatmapVersion = 0,
+  modelScale = 1,
+  modelRotation = { x: 0, y: 0, z: 0 },
+  modelPosition = { x: 0, y: 0, z: 0 }
 }) {
   const containerRef = useRef(null)
   const sceneRef = useRef(null)
@@ -17,6 +20,8 @@ export function HandModel({
   const heatmapTextureRef = useRef(null)
   const modelRef = useRef(null)
   const baseScaleRef = useRef(1)
+  const baseRotationRef = useRef({ x: -Math.PI / 3, y: 0, z: 0 })
+  const basePositionRef = useRef({ x: -1, y: -1, z: 0 })
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -128,8 +133,16 @@ export function HandModel({
     indicator.visible = false
     handGroup.add(indicator)
 
-    handGroup.rotation.x = -Math.PI / 3
-    handGroup.position.set(-1, -1, 0)
+    handGroup.rotation.set(
+      baseRotationRef.current.x,
+      baseRotationRef.current.y,
+      baseRotationRef.current.z
+    )
+    handGroup.position.set(
+      basePositionRef.current.x,
+      basePositionRef.current.y,
+      basePositionRef.current.z
+    )
 
     // Grid helper
     const gridHelper = new THREE.GridHelper(10, 20, 0xffffff, 0xffffff)
@@ -233,14 +246,38 @@ export function HandModel({
     if (!model) return
     const baseScale = baseScaleRef.current || 1
     const sign = isLeftHand ? 1 : -1
-    model.scale.set(baseScale * sign, baseScale, baseScale)
-  }, [isLeftHand])
+    const scale = Number.isFinite(modelScale) ? modelScale : 1
+    model.scale.set(baseScale * scale * sign, baseScale * scale, baseScale * scale)
+  }, [isLeftHand, modelScale])
+
+  useEffect(() => {
+    const group = handGroupRef.current
+    if (!group) return
+    const base = baseRotationRef.current
+    const rot = modelRotation || {}
+    group.rotation.set(
+      base.x + (rot.x || 0),
+      base.y + (rot.y || 0),
+      base.z + (rot.z || 0)
+    )
+  }, [modelRotation])
+
+  useEffect(() => {
+    const group = handGroupRef.current
+    if (!group) return
+    const base = basePositionRef.current
+    const pos = modelPosition || {}
+    group.position.set(
+      base.x + (pos.x || 0),
+      base.y + (pos.y || 0),
+      base.z + (pos.z || 0)
+    )
+  }, [modelPosition])
 
   return (
     <div 
       ref={containerRef} 
-      className="w-full h-full"
-      style={{ minHeight: '400px' }}
+      style={{ width: '100%', height: '100%' }}
     />
   )
 }

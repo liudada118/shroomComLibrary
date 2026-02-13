@@ -68,8 +68,11 @@
   ],
   "scripts": {
     "dev": "vite",
+    "dev:handmodal": "vite --config vite.handmodal.config.js",
     "build": "vite build",
+    "build:handmodal": "vite build --config vite.handmodal.config.js",
     "preview": "vite preview",
+    "preview:handmodal": "vite preview --config vite.handmodal.config.js",
     "pack:local": "node scripts/pack-local.mjs"
   },
   "dependencies": {
