@@ -14,8 +14,8 @@
  */
 
 import React, { useState } from 'react';
-import { useDeviceManager } from '../../hooks/useDeviceManager';
-import { ASSESSMENT_CHANNELS } from '../../lib/DeviceManager';
+import { useDeviceManager } from '../hooks/useDeviceManager';
+import { ASSESSMENT_CHANNELS } from '../device/DeviceManager';
 import FootpadConfigDialog from './FootpadConfigDialog';
 
 const DEVICE_TYPE_LABELS = {

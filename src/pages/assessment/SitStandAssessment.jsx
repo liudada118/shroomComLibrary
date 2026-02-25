@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAssessment } from '../../contexts/AssessmentContext';
 import { usePressureScene } from '../../hooks/usePressureScene';
-import Pressure2DView from '../../components/charts/Pressure2DView';
-import ViewToggle from '../../components/ui/ViewToggle';
-import EChart from '../../components/ui/EChart';
-import { getDeviceManager } from '../../lib/DeviceManager';
-import DevicePanel from '../../components/ui/DevicePanel';
+import Pressure2DView from '../../charts/pressure2d/Pressure2DView';
+import ViewToggle from '../../ui/ViewToggle';
+import EChart from '../../charts/echart/EChart';
+import { getDeviceManager } from '../../device/DeviceManager';
+import DevicePanel from '../../ui/DevicePanel';
 import { useChannelData } from '../../hooks/useDeviceManager';
 
 /* ─── 图表样式常量 ─── */

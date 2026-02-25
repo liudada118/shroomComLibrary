@@ -12,14 +12,10 @@
  */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import {
-  PressureScene3D,
-  createSeatSensorSerial,
-  createFootpadSensorSerial,
-  PressureSimulator,
-  matrixStats,
-  calculateCoP,
-} from '../lib/pressure-sensor';
+import { PressureScene3D } from '../pressure-sensor/PressureScene3D';
+import { createSeatSensorSerial, createFootpadSensorSerial } from '../pressure-sensor/PressureSensorSerial';
+import { PressureSimulator } from '../pressure-sensor/PressureSimulator';
+import { matrixStats, calculateCoP } from '../pressure-sensor/PressureDataProcessor';
 
 const SIM_INTERVAL = 50; // 模拟数据更新间隔（ms），约 20fps
 

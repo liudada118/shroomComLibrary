@@ -1,20 +1,20 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAssessment } from '../../contexts/AssessmentContext';
-import StandingReport from '../../components/report/StandingReport';
-import EChart from '../../components/ui/EChart';
-import InsoleScene from '../../components/three/InsoleScene';
-import Pressure2DView from '../../components/charts/Pressure2DView';
-import ViewToggle from '../../components/ui/ViewToggle';
-import { serialService } from '../../lib/SerialService';
-import { getDeviceManager } from '../../lib/DeviceManager';
-import DevicePanel from '../../components/ui/DevicePanel';
+import StandingReport from '../../report/standing/StandingReport';
+import EChart from '../../charts/echart/EChart';
+import InsoleScene from '../../heatmap/insole/InsoleScene';
+import Pressure2DView from '../../charts/pressure2d/Pressure2DView';
+import ViewToggle from '../../ui/ViewToggle';
+import { serialService } from '../../device/SerialService';
+import { getDeviceManager } from '../../device/DeviceManager';
+import DevicePanel from '../../ui/DevicePanel';
 import { useChannelData } from '../../hooks/useDeviceManager';
 import {
   splitLeftRight, calculateCOP, calculateTotalPressure, calculateContactArea,
   getValidCoords, divideXRegions, calculateRegionPressure, processFrameRealtime,
   generateFootReport, parseFrameData
-} from '../../lib/FootAnalysis';
+} from '../../analysis/FootAnalysis';
 
 const C = { text: '#6B7B8D', grid: '#EDF0F4', blue: '#0066CC', green: '#059669', red: '#DC2626', amber: '#D97706' };
 

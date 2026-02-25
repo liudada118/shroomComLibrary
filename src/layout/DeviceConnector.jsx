@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { serialService } from '../../lib/SerialService';
+import { serialService } from '../device/SerialService';
 
 const DEVICE_NAMES = {
   grip: '握力传感器手套',

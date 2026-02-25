@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAssessment } from '../contexts/AssessmentContext';
-import { searchHistory, deleteRecord, clearHistory } from '../lib/historyService';
+import { searchHistory, deleteRecord, clearHistory } from '../services/historyService';
 
 const ASSESSMENT_LABELS = {
   grip: '握力评估',

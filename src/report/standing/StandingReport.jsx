@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useMemo } from 'react';
 import * as echarts from 'echarts';
 import InteractiveArchChart from './InteractiveArchChart';
 import InteractiveCOPChart from './InteractiveCOPChart';
-import { parseFrameData } from '../../lib/FootAnalysis';
+import { parseFrameData } from '../../analysis/FootAnalysis';
 
 /* ─── 蔡司风格 EChart 封装（增量更新，避免闪烁） ─── */
 function EChart({ option, height = 280 }) {

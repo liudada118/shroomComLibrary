@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAssessment } from '../../contexts/AssessmentContext';
+import { useAssessment } from '../contexts/AssessmentContext';
 
 export default function PatientInfoDialog({ onStart, onCancel }) {
   const { patientInfo, setPatientInfo } = useAssessment();

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { serialService } from '../lib/SerialService';
+import { serialService } from '../device/SerialService';
 
 /**
  * 设备连接 Hook

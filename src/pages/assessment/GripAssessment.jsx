@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAssessment } from '../../contexts/AssessmentContext';
-import HandModel from '../../components/three/HandModel';
-import Pressure2DView from '../../components/charts/Pressure2DView';
-import ViewToggle from '../../components/ui/ViewToggle';
-import GripReport from '../../components/report/GripReport';
-import EChart from '../../components/ui/EChart';
-import { HeatmapCanvas } from '../../lib/heatmap';
-import { mapLeftHand, mapRightHand, generateSimulatedSensorData } from '../../lib/gripDataMapping';
-import { getDeviceManager } from '../../lib/DeviceManager';
-import DevicePanel from '../../components/ui/DevicePanel';
+import HandModel from '../../heatmap/handmodal/HandHeatmapModel';
+import Pressure2DView from '../../charts/pressure2d/Pressure2DView';
+import ViewToggle from '../../ui/ViewToggle';
+import GripReport from '../../report/grip/GripReport';
+import EChart from '../../charts/echart/EChart';
+import { HeatmapCanvas } from '../../analysis/heatmap';
+import { mapLeftHand, mapRightHand, generateSimulatedSensorData } from '../../analysis/gripDataMapping';
+import { getDeviceManager } from '../../device/DeviceManager';
+import DevicePanel from '../../ui/DevicePanel';
 import { useChannelData } from '../../hooks/useDeviceManager';
 
 /* ─── 步骤指示器 (蔡司风格) ─── */

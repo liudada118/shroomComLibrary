@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { saveAssessmentSession } from '../lib/historyService';
+import { saveAssessmentSession } from '../services/historyService';
 
 const AssessmentContext = createContext(null);
 

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getHistory } from '../lib/historyService';
-import GripReport from '../components/report/GripReport';
-import StandingReport from '../components/report/StandingReport';
+import { getHistory } from '../services/historyService';
+import GripReport from '../report/grip/GripReport';
+import StandingReport from '../report/standing/StandingReport';
 
 const TYPE_LABELS = {
   grip: '握力评估',

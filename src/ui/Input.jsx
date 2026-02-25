@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../services/utils'
 
 export function Input({ className, type = 'text', ...props }) {
   return (

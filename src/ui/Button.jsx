@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../services/utils'
 
 const buttonVariants = {
   default: 'bg-[#A0AEC0] hover:bg-[#718096] text-white shadow-md',

@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getDeviceManager } from '../lib/DeviceManager.js';
+import { getDeviceManager } from '../device/DeviceManager.js';
 
 /**
  * 主 Hook：管理设备连接和数据

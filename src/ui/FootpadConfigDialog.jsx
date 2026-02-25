@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useFootpadConfig } from '../../hooks/useDeviceManager';
+import { useFootpadConfig } from '../hooks/useDeviceManager';
 
 const FOOTPAD_LABELS = {
   1: '左前脚垫',

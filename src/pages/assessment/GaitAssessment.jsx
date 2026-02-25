@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAssessment } from '../../contexts/AssessmentContext';
-import EChart from '../../components/ui/EChart';
-import FootpadSceneReact from '../../lib/footpad-sdk/components/FootpadSceneReact';
-import Pressure2DView from '../../components/charts/Pressure2DView';
-import ViewToggle from '../../components/ui/ViewToggle';
-import { footpadServices, SENSOR_KEYS } from '../../lib/footpad-sdk/services/FootpadSerialService';
-import { generateAnimatedWalkwayData } from '../../lib/footpad-sdk/utils/mockFootprintData';
+import EChart from '../../charts/echart/EChart';
+import FootpadSceneReact from '../../footpad-sdk/components/FootpadSceneReact';
+import Pressure2DView from '../../charts/pressure2d/Pressure2DView';
+import ViewToggle from '../../ui/ViewToggle';
+import { footpadServices, SENSOR_KEYS } from '../../footpad-sdk/services/FootpadSerialService';
+import { generateAnimatedWalkwayData } from '../../footpad-sdk/utils/mockFootprintData';
 import gaitDemoDataUrl from '../../assets/gait_demo_data.json?url';
-import { getDeviceManager } from '../../lib/DeviceManager';
-import DevicePanel from '../../components/ui/DevicePanel';
+import { getDeviceManager } from '../../device/DeviceManager';
+import DevicePanel from '../../ui/DevicePanel';
 import { useChannelData } from '../../hooks/useDeviceManager';
 
 /* ─── 图表样式常量 ─── */

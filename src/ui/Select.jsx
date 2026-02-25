@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '../services/utils'
 import { ChevronDown } from 'lucide-react'
 
 export function Select({ value, onValueChange, placeholder, children, className }) {

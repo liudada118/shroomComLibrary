@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAssessment } from '../contexts/AssessmentContext';
-import DevicePanel from '../components/ui/DevicePanel';
+import DevicePanel from '../ui/DevicePanel';
 
 /* ─── 图标组件 ─── */
 
