@@ -14,14 +14,30 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) =>
-        ['react', 'react-dom', 'echarts', 'three'].includes(id) ||
-        id.startsWith('three/'),
+        [
+          'react', 'react-dom', 'echarts', 'three',
+          '@react-three/fiber', '@react-three/drei',
+          'react-router-dom', 'lucide-react',
+          'clsx', 'tailwind-merge', 'antd',
+          'echarts-for-react'
+        ].includes(id) ||
+        id.startsWith('three/') ||
+        id.startsWith('@react-three/') ||
+        id.startsWith('lucide-react/'),
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           echarts: 'echarts',
-          three: 'THREE'
+          three: 'THREE',
+          '@react-three/fiber': 'ReactThreeFiber',
+          '@react-three/drei': 'ReactThreeDrei',
+          'react-router-dom': 'ReactRouterDOM',
+          'lucide-react': 'LucideReact',
+          clsx: 'clsx',
+          'tailwind-merge': 'tailwindMerge',
+          antd: 'antd',
+          'echarts-for-react': 'EChartsForReact'
         }
       }
     }

@@ -8,3 +8,12 @@ export { default as HandHeatmapModel } from './handmodal/HandHeatmapModel.jsx'
 export { default as SitAndFootScene } from './sitAndfoot/ThreeScene.jsx'
 export { default as FootLenScene } from './footLen/ThreeScene.jsx'
 export { default as FootSinkScene } from './footSink/ThreeScene.jsx'
+
+// 新增：鞋垫压力3D模型
+export { InsoleModel, InsoleScene, InsoleDataContext } from './insole/index.js'
+
+// 新增：足部3D模型
+export { FootModel } from './foot/index.js'
+
+// 新增：人体3D模型
+export { HumanModel } from './human/index.js'
